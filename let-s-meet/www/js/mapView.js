@@ -1,0 +1,311 @@
+/*
+	g00glemaps.stawrocek@gmail.com -> API key mail
+	API_KEY -> AIzaSyCjSNcbxLngWgQHrHte2nyD24duvrp0xkQ
+*/
+
+var searchTheaters = false;
+var searchRestaurants = false;
+var searchCinemas = false;
+var locationX=51.5, locationY=-0.2; //London
+
+var map;
+var placesService;
+var directionsDisplay;
+var directionsService;
+
+var vecTargets=[];
+var vecRoutes=[];
+var vecOverQuery=[];
+var showAll=false;
+
+function booleanToStr(x){
+	if(x=="false")return false;
+	if(x=="true")return true;
+	return NaN;
+}
+ 
+function Target(typeStr, googleId){
+	this.typeStr = typeStr;
+	this.googleId = googleId;
+	this.isEnabled = booleanToStr(localStorage.getItem(this.typeStr));
+}
+
+function RouteResult(response, destObj, travelType){
+	this.response = response;
+	this.destinationObject = destObj;
+	this.travelType = travelType;
+	this.time = response.routes[0].legs[0].duration.text;
+	this.timeValue = response.routes[0].legs[0].duration.value;
+	this.dist = response.routes[0].legs[0].distance.text;
+}
+
+function OverQueryError(destObj, travelType){
+	this.destinationObject = destObj;
+	this.travelType = travelType;
+}
+
+function loadPage(){
+	vecTargets.push(new Target("Museum", "museum"));
+	vecTargets.push(new Target("Restaurant", "restaurant"));
+	vecTargets.push(new Target("Cinema", "movie_theater"));
+	vecTargets.push(new Target("Shop", "store"));
+}
+
+function createGoogleMaps(){
+	var mapOptions = {
+		center: new google.maps.LatLng(51.5, -0.2),
+		zoom: 16
+	}
+	map = new google.maps.Map(document.getElementById("map"), mapOptions);
+	directionsDisplay = new google.maps.DirectionsRenderer;
+	directionsDisplay.setMap(map);
+	directionsService = new google.maps.DirectionsService;
+	service = new google.maps.places.PlacesService(map);
+	locationX = parseFloat(localStorage.getItem('locX'));
+	locationY = parseFloat(localStorage.getItem('locY'));
+	
+	var geolocate = new google.maps.LatLng(locationX, locationY);
+	createInfoWindow("You!", geolocate);
+            
+    map.setCenter(geolocate);
+	setTimeout("findPlacesSelectedByUser();", 4000);
+}
+
+function loadMap(){
+	$("#sortedLocations").hide();
+}
+
+function loadLocations(){
+	$("#sortedLocations").show();
+}
+
+function drawRoute(response){
+	directionsDisplay.setDirections(response);
+}
+
+function shortenName(name){
+	return name.substr(0, 15)+"...";
+}
+
+function calcRouteToObjectAndTravelType(destObj, travelType){
+	directionsService.route({
+		origin: {lat: locationX, lng: locationY},  // Haight.
+		destination: {placeId: destObj.place_id},
+		travelMode: travelType
+	}, 
+	function(response, status) {
+		if (status == 'OK') {
+			var point = response.routes[0].legs[0];
+			/*console.log(destObj.name + " " + travelType + " " + response.routes.length);
+			for(var i = 0; i < response.routes.length; i++){
+				console.log(response.routes[i].legs[0].duration.text);
+			}*/
+			vecRoutes.push(new RouteResult(response, destObj, travelType));
+			return true;
+		} else {
+			console.log(destObj.name);
+			vecOverQuery.push(new OverQueryError(destObj, travelType));
+			return false;
+			//window.alert('Directions request failed due to ' + status);
+		}
+	});
+}
+
+function calculateRoute(destObj) {
+	if(localStorage.getItem("walking") == "true"){
+		calcRouteToObjectAndTravelType(destObj, google.maps.TravelMode.WALKING);
+	}
+	if(localStorage.getItem("driving") == "true"){
+		calcRouteToObjectAndTravelType(destObj, google.maps.TravelMode.DRIVING);
+	}
+	if(localStorage.getItem("transit") == "true"){
+		calcRouteToObjectAndTravelType(destObj, google.maps.TravelMode.TRANSIT);
+	}
+	if(localStorage.getItem("cycling") == "true"){
+		calcRouteToObjectAndTravelType(destObj, google.maps.TravelMode.BICYCLING);
+	}
+}
+
+function createInfoWindow(str, geolocate){
+	var infowindow = new google.maps.InfoWindow({
+        map: map,
+        position: geolocate,
+        content: str
+    });
+	return infowindow;
+}
+
+function createMarker(iconUrl, geolocate){
+
+	var icon = {
+		url: iconUrl, // url
+		scaledSize: new google.maps.Size(25, 25), // scaled size
+		origin: new google.maps.Point(0,0), // origin
+		anchor: new google.maps.Point(0,0) // anchor
+	};
+
+	var marker = new google.maps.Marker({
+		position: geolocate,
+		map: map,
+		icon: icon
+	});
+	return marker;
+}
+
+function createLocationRequest(typeStr, radiusInMeters, locationLatLng){
+	var request = {
+		location: locationLatLng,
+		radius: radiusInMeters,
+		types: [typeStr]
+	};
+	return request;
+}
+
+function infoWindowOnClick(place){
+	var minTime = 1000000;
+	var minIdx=-1;
+	for(var i = 0; i < vecRoutes.length; i++){
+		if(vecRoutes[i].destinationObject.place_id == place){
+			if(vecRoutes[i].timeValue < minTime){
+				minTime = vecRoutes[i].timeValue;
+				minIdx = i;
+			}
+		}
+	}
+	if(minIdx==-1)
+		alert("location not loaded due to query limit error");
+	else
+		locationOnclick(minIdx);
+}
+
+var createClickHandlerMarker = function(arg) {
+  return function() { infoWindowOnClick(arg); };
+}
+
+function nearbySearchCallback(results, status) {
+	if (status == google.maps.places.PlacesServiceStatus.OK) {
+		for (var i = 0; i < results.length; i++) {
+			var place = results[i];
+			calculateRoute(place);
+			//createInfoWindow(shortenName(place.name), place.geometry.location);
+			/*createInfoWindow("<img src='" + place.icon + "' style='width: 16px; height: auto;'"+ 
+			"onclick='infoWindowOnClick(\""+place.place_id+"\")'></img>", place.geometry.location);*/
+			
+			var tmpMarker = createMarker(place.icon, place.geometry.location);
+			tmpMarker.addListener('click', createClickHandlerMarker(place.place_id));
+			//console.log(place.icon);
+			//console.log(place.html_attributions);
+		}
+	}
+	else if(status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS){
+		alert("No matching places");
+	}
+	else{
+		alert("Error!");
+	}
+}
+
+function locationOnclick(id){
+	drawRoute(vecRoutes[id].response);
+	$("#sortedLocations").hide();
+	
+	$("#locationDescriptionContent").empty();
+	var a = document.createElement('div');
+	var iHtml = vecRoutes[id].destinationObject.name+"("+vecRoutes[id].time+", " + vecRoutes[id].dist + ") | " + vecRoutes[id].travelType;
+	a.innerHTML = iHtml;
+	a.className='well well-sm';
+	$("#locationDescriptionContent").append(a);
+		
+	var _br = document.createElement('br');
+	$("#locationDescriptionContent").append(_br);
+		
+	var infoContent="<h5>"+vecRoutes[id].destinationObject.name+"</h5>";
+	infoContent += ("<div>Time of travel: " + vecRoutes[id].time+"<br>");
+	infoContent += ("Distance: " + vecRoutes[id].dist+"<br>");
+	infoContent += ("Travel type: " + vecRoutes[id].travelType+"<br>");
+	infoContent += ("Address: " + vecRoutes[id].destinationObject.vicinity+"<br>");
+	infoContent += "<br></div>";
+	var newDetailedWindow = createInfoWindow(infoContent, vecRoutes[id].destinationObject.geometry.location);
+	
+	$("#locationDescription").show();
+}
+
+var createClickHandler = function(arg) {
+  return function() { locationOnclick(arg); };
+}
+
+function retryFailedQueries(){
+	console.log("retry failed queries " + vecOverQuery.length.toString());
+	for(var i = 0; i < vecOverQuery.length; i++){
+		var obj = vecOverQuery[i].destinationObject;
+		var trv = vecOverQuery[i].travelType;
+		vecOverQuery.splice(i, 1);       			//remove item in case when calcR...Type returns error again (and call push)	
+		calcRouteToObjectAndTravelType(obj, trv);
+	}
+	setTimeout("checkIfAllRoutesFound();", 5000);
+}
+
+function checkIfAllRoutesFound(){
+	if(vecOverQuery.length == 0){
+		onAllRoutesFound(10);
+	}
+	else{	
+		setTimeout("retryFailedQueries()", 10000);
+	}
+}
+
+function onAllRoutesFound(maxiVal){
+	if(maxiVal == 1000)  //show/hide more button
+	{
+		showAll=!showAll;
+		if(showAll){
+			maxiVal = 1000;
+			document.getElementById("showAll").innerHTML = "Show Less";
+		}
+		else{
+			maxiVal = 10;
+			document.getElementById("showAll").innerHTML = "Show All";
+		}
+	}
+	
+	for(var i = 0; i < vecOverQuery.length; i++){
+		console.log("vecOverQuery: " + vecOverQuery[i].destinationObject.name + " " + vecOverQuery[i].travelType);
+	}
+
+	vecRoutes.sort(function(a,b){
+		return a.timeValue > b.timeValue ? 1 : -1;
+	});
+	$("#sortedLocationsContent").empty();
+	console.log("dbg start");
+	for(var i = 0; i < Math.min(vecRoutes.length, maxiVal); i++){
+		console.log(vecRoutes[i].destinationObject.name+ " " + vecRoutes[i].time + " " + vecRoutes[i].dist);
+		var a = document.createElement('a');
+		a.href = "#";
+		a.text = shortenName(vecRoutes[i].destinationObject.name)+"("+vecRoutes[i].time+") | " + vecRoutes[i].travelType;
+		a.className='btn btn-primary btn-lg active btn100Width';
+		a.onclick=createClickHandler(i);
+		$("#sortedLocationsContent").append(a);
+		
+		var _br = document.createElement('br');
+		$("#sortedLocationsContent").append(_br);
+	}
+	$("#sortedLocations").show();
+}
+
+function findPlacesSelectedByUser(){
+	var geolocate = new google.maps.LatLng(locationX, locationY);
+	var radius = 1000;
+	var lastIdx=0;
+	for(var i = 0; i < vecTargets.length; i++){
+		if(vecTargets[i].isEnabled)
+			lastIdx=i;
+	}
+	for(var i = 0; i < vecTargets.length; i++){
+		if(vecTargets[i].isEnabled){
+			if(i == lastIdx){
+				setTimeout("checkIfAllRoutesFound();", 2000);
+			}
+			service.nearbySearch(createLocationRequest(vecTargets[i].googleId, radius, geolocate), nearbySearchCallback);
+		}
+	}
+}

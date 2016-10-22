@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<script src="js/jquery.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/transportGPSView.js"></script>
+        <title>Meet in The Middle</title>
+    </head>
+    <body>
+        <div class="container">
+			<div class="page-header">
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="col-sm-4">
+						<div id="chooseGeolocalizationType">
+							<div class="well well-sm"><h4>Choose method of geolocalization</h4></div>
+							<button type="button" class="btn btn-primary btn-block" id="btnGPS" onclick="setGeoInput('gps')">GPS</button>
+							<button type="button" class="btn btn-primary btn-block" id="btnInputAdress" data-toggle="modal" data-target="#addressModel" onclick="setGeoInput('userIn')">Input Adress</button>
+							<hr>
+						</div>
+						<div id="chooseTransportType" hidden>
+							<div class="well well-sm"><h4>Choose transport types</h4></div>
+																													   <!--"perfect"-->
+							<button type="button" class="btn btn-primary btn-block" id="walking" onclick='setTransportType("walking")'>Walking</button>
+							<button type="button" class="btn btn-primary btn-block" id="driving" onclick='setTransportType("driving")'>Driving</button>
+							<button type="button" class="btn btn-primary btn-block" id="transit" onclick='setTransportType("transit")'>Public Transport</button>
+							<button type="button" class="btn btn-primary btn-block" id="cycling" onclick='setTransportType("cycling")'>Cycling</button>
+																													   <!--"perfect"-->
+							<hr>
+						</div>
+						<br>
+						<button type="button" class="btn btn-primary btn-block" id="accept" onclick = "acceptForm();">Ok</button>
+					</div>
+				</div>
+				<div id="addressModel" class="modal fade" role="dialog">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title">Type in your desired location</h4>
+							</div>
+							<div class="modal-body">
+								<label for="usrLocation">Address:</label><input type="text" class="form-control" id="usrLocation" placeholder="221B Baker Street">
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" id="btnAcceptModalLocation" data-dismiss="modal" onclick="updateUserLocation();">Accept</button>
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+        </div>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/app.js"></script>
+		<script async defer
+			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCjSNcbxLngWgQHrHte2nyD24duvrp0xkQ&callback=createGoogleMaps">
+		</script>
+    </body>
+</html>

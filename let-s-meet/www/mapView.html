@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<script src="js/jquery.js"></script>
+		<script src="js/mapView.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+        <title>Meet in The Middle</title>
+    </head>
+    <body onload="loadPage();">
+        <div class="container">
+			<div class="page-header">
+				<div class="btn-group btn-group-justified">
+					<a href="#" id="topHrefMap" class="btn btn-primary" onclick="loadMap();">Map</a>
+					<a href="#" id="topHrefLocations" class="btn btn-primary" onclick="loadLocations();">Locations</a>
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div hidden id="sortedLocations" style="width: 100%;">
+						<div id="sortedLocationsContent" style="width: 100%;">
+						
+						</div>
+						<br>
+						<button id="showAll" onclick="onAllRoutesFound(1000);" class="btn btn-primary btn-lg active btn100Width">Show All</button>
+						<hr>
+					</div>
+					<div hidden id="locationDescription" style="width: 100%;">
+						<div id="locationDescriptionContent" style="width: 100%;">
+						
+						</div>
+						<hr>
+					</div>
+					<div id="map" style="left:3%;width:94%;height:500px"></div>
+				</div>
+			</div>
+        </div>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/app.js"></script>
+		<script async defer
+			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCjSNcbxLngWgQHrHte2nyD24duvrp0xkQ&callback=createGoogleMaps&libraries=places">
+		</script>
+		
+    </body>
+</html>
