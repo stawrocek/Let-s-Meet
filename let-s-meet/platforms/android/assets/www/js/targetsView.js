@@ -55,9 +55,6 @@ function loadPage(){
 	vecTargets.push(new Target("Subway Station"));
 	vecTargets.push(new Target("Taxi Stand"));
 
-	/*vecTargets.push(new Target("Restaurant"));
-	vecTargets.push(new Target("Cinema"));
-	vecTargets.push(new Target("Shop"));*/
 	for(var i = 0; i < vecTargets.length; i++){
 		console.log(vecTargets[i]);
 		vecTargets[i].isEnabled = false;

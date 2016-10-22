@@ -52,10 +52,6 @@ function OverQueryError(destObj, travelType){
 }
 
 function loadPage(){
-	/*vecTargets.push(new Target("Museum", "museum"));
-	vecTargets.push(new Target("Restaurant", "restaurant"));
-	vecTargets.push(new Target("Cinema", "movie_theater"));
-	vecTargets.push(new Target("Shop", "store"));*/
 	vecTargets.push(new Target("Airport", "airport"));
 	vecTargets.push(new Target("Art Gallery, art_gallery"));
 	vecTargets.push(new Target("Atm", "atm"));

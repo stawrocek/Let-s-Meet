@@ -31,11 +31,26 @@ function getPosition(position){
 	$("#chooseTransportType").show();
 }
 
+function displayError(error) {
+  var errors = { 
+    1: 'Permission denied',
+    2: 'Position unavailable',
+    3: 'Request timeout'
+  };
+  alert("Error: " + errors[error.code]);
+}
+
 function setGeoInput(type){
 	localStorage.setItem('geolocType', type);
 	if(type=='gps'){
 		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(getPosition);
+			//navigator.geolocation.getCurrentPosition(getPosition);
+			navigator.geolocation.getCurrentPosition(
+			getPosition, 
+			displayError,
+			{ enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+		  );
+
 		} else {
 			alert("GPS is not enabled!");
 		}
