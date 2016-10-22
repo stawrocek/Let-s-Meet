@@ -52,10 +52,35 @@ function OverQueryError(destObj, travelType){
 }
 
 function loadPage(){
-	vecTargets.push(new Target("Museum", "museum"));
-	vecTargets.push(new Target("Restaurant", "restaurant"));
+	vecTargets.push(new Target("Airport", "airport"));
+	vecTargets.push(new Target("Art Gallery, art_gallery"));
+	vecTargets.push(new Target("Atm", "atm"));
+	vecTargets.push(new Target("Bakery", "bakery"));
+	vecTargets.push(new Target("Bank", "bank"));
+	vecTargets.push(new Target("Bar", "bar"));
+	vecTargets.push(new Target("Bowling Alley", "bowling_alley"));
+	vecTargets.push(new Target("Cafe", "cafe"));
 	vecTargets.push(new Target("Cinema", "movie_theater"));
+	vecTargets.push(new Target("Doctor", "doctor"));
+	vecTargets.push(new Target("Fire Station", "fire_station"));
+	vecTargets.push(new Target("Gas Station", "gas_station"));
+	vecTargets.push(new Target("Gym", "gym"));
+	vecTargets.push(new Target("Hospital", "hospital"));
+	vecTargets.push(new Target("Library", "library"));
+	vecTargets.push(new Target("Movie Rental", "movie_rental"));
+	vecTargets.push(new Target("Museum", "museum"));
+	vecTargets.push(new Target("Night Club", "night_club"));
+	vecTargets.push(new Target("Park", "park"));
+	vecTargets.push(new Target("Parking", "parking"));
+	vecTargets.push(new Target("Pharmacy", "pharmacy"));
+	vecTargets.push(new Target("Police", "police"));
+	vecTargets.push(new Target("Post Office", "post_office"));
+	vecTargets.push(new Target("Restaurant", "restaurant"));
 	vecTargets.push(new Target("Shop", "store"));
+	vecTargets.push(new Target("Shopping Mall", "shopping_mall"));
+	vecTargets.push(new Target("Stadium", "stadium"));
+	vecTargets.push(new Target("Subway Station", "subway_station"));
+	vecTargets.push(new Target("Taxi Stand", "taxi_stand"));
 }
 
 function createGoogleMaps(){
