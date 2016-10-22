@@ -37,7 +37,10 @@ function displayError(error) {
     2: 'Position unavailable',
     3: 'Request timeout'
   };
-  alert("Error: " + errors[error.code]);
+  if(error.code==1){
+	navigator.geolocation.getCurrentPosition(getPosition);
+  }
+  else alert("Error: " + errors[error.code]);
 }
 
 function setGeoInput(type){
