@@ -299,7 +299,7 @@ function displayRoutesAsButtons(maxiVal){
 
 function findPlacesSelectedByUser(){
 	var geolocate = new google.maps.LatLng(locationX, locationY);
-	var radius = 1500;
+	var radius = 1000;
 	var lastIdx=0;
 	for(var i = 0; i < vecTargets.length; i++){
 		if(vecTargets[i].isEnabled)
